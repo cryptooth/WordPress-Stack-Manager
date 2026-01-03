@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  manager:
+    build: .
+    restart: always
+    container_name: wp_manager
+    environment:
+      - ADMIN_PASSWORD=supersecureadminpassword123
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../sites:/app/sites
+    networks:
+      - default
+      - proxy
+    ports:
+      - "127.0.0.1:3000:3000"
+
+networks:
+  proxy:
+    name: nginx-proxy-manager_default
+    external: true

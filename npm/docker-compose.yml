@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: always
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    networks:
+      - default
+      - proxy
+
+networks:
+  proxy:
+    name: nginx-proxy-manager_default
+    driver: bridge

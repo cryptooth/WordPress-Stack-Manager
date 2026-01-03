@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress Stack Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Extra styles for summary modal */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .summary-item label {
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .summary-item div {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .copy-btn {
+            float: right;
+            cursor: pointer;
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>WordPress Stack Manager</h1>
+            <div style="display:flex; gap:1rem; align-items:center;">
+                <div id="status" style="color: var(--text-secondary);">Loading...</div>
+                <button onclick="logout()"
+                    style="background:transparent; border:1px solid #334155; color:var(--text-secondary); padding:0.4rem 0.8rem; border-radius:6px; cursor:pointer;">Logout</button>
+            </div>
+        </header>
+
+        <div class="grid" id="sitesGrid">
+            <!-- Add Card -->
+            <div class="card add-card" onclick="openModal('createModal')">
+                <div class="icon-plus">+</div>
+                <h3>New Site</h3>
+            </div>
+            <!-- Sites will be injected here -->
+        </div>
+    </div>
+
+    <!-- Create Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 1.5rem;">Create New Stack</h2>
+            <form id="createForm">
+                <div class="form-group">
+                    <label>Domain Name</label>
+                    <input type="text" id="domain" placeholder="example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Database Name</label>
+                    <input type="text" id="dbName" placeholder="wordpress" required>
+                </div>
+                <div class="form-group">
+                    <label>Database User</label>
+                    <input type="text" id="dbUser" placeholder="user" required>
+                </div>
+                <div class="form-group">
+                    <label>Database Password</label>
+                    <input type="text" id="dbPassword" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label>Database Root Password</label>
+                    <input type="text" id="dbRootPassword" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label>SFTP User</label>
+                    <input type="text" id="sftpUser" placeholder="sftpuser" required>
+                </div>
+                <div class="form-group">
+                    <label>SFTP Password</label>
+                    <input type="text" id="sftpPassword" required minlength="8">
+                </div>
+                <button type="submit" class="btn" id="submitBtn">Deploy Stack</button>
+            </form>
+            <button class="btn" onclick="closeModal('createModal')"
+                style="background: transparent; border: 1px solid #334155; margin-top: 0.5rem;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div class="modal" id="summaryModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="font-size: 3rem; color: var(--success);">✓</div>
+                <h2>Deployment Successful!</h2>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <label>Domain</label>
+                    <div id="sumDomain">-</div>
+                </div>
+                <div class="summary-item">
+                    <label>WP Internal URL</label>
+                    <div id="sumWpUrl">-</div>
+                </div>
+                <div class="summary-item">
+                    <label>DB Name</label>
+                    <div id="sumDbName">-</div>
+                </div>
+                <div class="summary-item">
+                    <label>DB User</label>
+                    <div id="sumDbUser">-</div>
+                </div>
+                <div class="summary-item">
+                    <label>DB Password</label>
+                    <div id="sumDbPass">-</div>
+                </div>
+                <div class="summary-item">
+                    <label>Internal Ports</label>
+                    <div id="sumPorts" style="font-size: 0.9rem;">-</div>
+                </div>
+                <div class="summary-item">
+                    <label>SFTP Details</label>
+                    <div id="sumSftp" style="font-size: 0.9rem;">-</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                <strong>Next Steps:</strong><br>
+                1. Configure NPM Proxy Host for <code><span id="sumDomainText"></span></code> → Port 80.<br>
+                2. (Optional) Configure PMA Proxy → <code><span id="sumPmaHost"></span></code>.
+            </div>
+
+            <button class="btn" onclick="closeModal('summaryModal'); loadSites();"
+                style="margin-top: 1.5rem;">Close</button>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content modal-lg">
+            <h2 id="detailDomain" style="margin-bottom: 0.5rem;">-</h2>
+
+            <table style="width:100%; text-align:left; border-collapse: collapse; margin-bottom: 2rem;">
+                <thead>
+                    <tr style="border-bottom: 1px solid #334155;">
+                        <th style="padding: 0.5rem;">Service</th>
+                        <th style="padding: 0.5rem;">Container Name (Host)</th>
+                        <th style="padding: 0.5rem;">Port</th>
+                        <th style="padding: 0.5rem;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="detailTableBody">
+                    <!-- Injected via JS -->
+                </tbody>
+            </table>
+
+            <div style="display:flex; gap:1rem;">
+                <button class="btn" onclick="closeModal('detailsModal')"
+                    style="background: transparent; border: 1px solid #334155;">Close</button>
+                <button class="btn" onclick="confirmDelete()" style="background: #ef4444;">Delete Site</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content" style="border: 1px solid #ef4444;">
+            <div style="color:#ef4444; font-size:3rem; text-align:center; margin-bottom:1rem;">⚠</div>
+            <h2 style="text-align:center; margin-bottom:1rem;">Are you sure?</h2>
+
+            <p style="text-align:center; color:#cbd5e1; margin-bottom:1.5rem;">
+                This will permanently delete <strong><span id="delWarningDomain"></span></strong>.
+                <br><br>
+                All files and the <strong>Database</strong> will be destroyed.
+                <br>
+                This action cannot be undone.
+            </p>
+
+            <button class="btn" id="deleteBtn" onclick="doDelete()"
+                style="background: #ef4444; margin-bottom: 0.5rem;">Yes, Delete Everything</button>
+            <button class="btn" onclick="closeModal('deleteModal')"
+                style="background: transparent; border: 1px solid #334155;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Check Auth and Load
+        async function loadSites() {
+            try {
+                const res = await fetch('/api/sites');
+                if (res.status === 401) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                if (!res.ok) throw new Error('Failed to load');
+                const sites = await res.json();
+                const grid = document.getElementById('sitesGrid');
+                const status = document.getElementById('status');
+
+                // Keep the add card, remove others
+                const addCard = grid.firstElementChild;
+                grid.innerHTML = '';
+                grid.appendChild(addCard);
+
+                sites.forEach(site => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => showDetails(site);
+                    card.style.cursor = 'pointer';
+                    card.innerHTML = `
+                        <h3>${site.name}</h3>
+                        <div class="stat"><span>App Port</span> <span class="badge badge-wp">${site.appPort}</span></div>
+                        <div class="stat"><span>DB Port</span> <span class="badge badge-db">${site.dbPort}</span></div>
+                        <div class="stat"><span>PMA Port</span> <span class="badge badge-pma">${site.pmaPort}</span></div>
+                        <div class="stat"><span>SFTP Port</span> <span class="badge" style="background:var(--accent); color:white;">${site.sftpPort}</span></div>
+                    `;
+                    grid.appendChild(card);
+                });
+                status.innerText = `${sites.length} Active Stacks`;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Details Logic
+        let currentSite = null;
+
+        function showDetails(site) {
+            currentSite = site;
+            document.getElementById('detailDomain').innerText = site.name;
+
+            const tbody = document.getElementById('detailTableBody');
+            const safeName = site.name.replace(/[^a-z0-9]/g, '');
+
+            const services = [
+                { name: 'Application (WP)', host: `${safeName}-wordpress-1`, port: 80, extPort: site.appPort },
+                { name: 'Database', host: `${safeName}-db-1`, port: 3306, extPort: site.dbPort },
+                { name: 'PhpMyAdmin', host: `${safeName}-pma-1`, port: 80, extPort: site.pmaPort },
+                { name: 'SFTP', host: `${safeName}-sftp-1`, port: 22, extPort: site.sftpPort },
+            ];
+
+            tbody.innerHTML = services.map(s => `
+                <tr style="border-bottom: 1px solid #1e293b;">
+                    <td style="padding: 0.8rem 0.5rem;">${s.name}</td>
+                    <td style="padding: 0.8rem 0.5rem; font-family:monospace; color:var(--accent);">${s.host}</td>
+                    <td style="padding: 0.8rem 0.5rem; font-family:monospace;">${s.extPort}</td>
+                    <td style="padding: 0.8rem 0.5rem;">
+                        <button onclick="navigator.clipboard.writeText('${s.host}')" style="background:transparent; border:1px solid #334155; padding:0.2rem 0.5rem; border-radius:4px; cursor:pointer; font-size:0.8rem;">Copy Host</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            openModal('detailsModal');
+        }
+
+        function confirmDelete() {
+            closeModal('detailsModal');
+            document.getElementById('delWarningDomain').innerText = currentSite.name;
+            openModal('deleteModal');
+        }
+
+        async function doDelete() {
+            if (!currentSite) return;
+            const btn = document.getElementById('deleteBtn');
+            btn.disabled = true;
+            btn.innerText = 'Deleting...';
+
+            try {
+                const res = await fetch(`/api/sites/${currentSite.name}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Delete failed');
+
+                closeModal('deleteModal');
+                loadSites();
+            } catch (err) {
+                alert('Error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Yes, Delete Everything';
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        const form = document.getElementById('createForm');
+        const btn = document.getElementById('submitBtn');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.innerText = 'Deploying... (This takes ~30s)';
+
+            const domain = document.getElementById('domain').value;
+            const dbName = document.getElementById('dbName').value;
+            const dbUser = document.getElementById('dbUser').value;
+            const dbPassword = document.getElementById('dbPassword').value;
+            const dbRootPassword = document.getElementById('dbRootPassword').value;
+            const sftpUser = document.getElementById('sftpUser').value;
+            const sftpPassword = document.getElementById('sftpPassword').value;
+
+            try {
+                const res = await fetch('/api/sites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ domain, dbName, dbUser, dbPassword, dbRootPassword, sftpUser, sftpPassword })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                // Show Summary
+                document.getElementById('sumDomain').innerText = data.config.domain;
+                document.getElementById('sumDomainText').innerText = data.config.domain;
+                document.getElementById('sumWpUrl').innerText = `http://${data.config.domain}`; // Placeholder
+                document.getElementById('sumDbName').innerText = data.config.dbName;
+                document.getElementById('sumDbUser').innerText = data.config.dbUser;
+                document.getElementById('sumDbPass').innerText = data.config.dbPassword;
+                document.getElementById('sumDbPass').innerText = data.config.dbPassword;
+                document.getElementById('sumPorts').innerText = `App:${data.config.ports.app} | DB:${data.config.ports.db}`;
+                document.getElementById('sumSftp').innerText = `Port: ${data.config.ports.sftp} | User: ${data.config.sftp.user}`;
+                document.getElementById('sumPmaHost').innerText = `${data.config.domain.replace(/\./g, '')}-pma-1`;
+                document.getElementById('sumPmaHost').innerText = `${data.config.domain.replace(/\./g, '')}-pma-1`;
+
+                closeModal('createModal');
+                openModal('summaryModal');
+                form.reset();
+            } catch (err) {
+                alert('Error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Deploy Stack';
+            }
+        };
+
+        loadSites();
+    </script>
+</body>
+
+</html>

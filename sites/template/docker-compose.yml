@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.6
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - default
+    ports:
+      - "127.0.0.1:${DB_PORT:-3306}:3306"
+    command: '--default-authentication-plugin=mysql_native_password'
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "127.0.0.1:${PMA_PORT:-8081}:80"
+    networks:
+      - default
+      - proxy
+
+  wordpress:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
+    volumes:
+      - wp_data:/var/www/html
+    networks:
+      - default
+      - proxy
+    ports:
+      - "127.0.0.1:${APP_PORT:-8080}:80"
+
+  sftp:
+    image: atmoz/sftp
+    restart: always
+    volumes:
+      - wp_data:/home/${SFTP_USER:-user}/upload
+    ports:
+      - "${SFTP_PORT:-2222}:22"
+    command: ${SFTP_USER:-user}:${SFTP_PASSWORD:-pass}:1001
+
+networks:
+  proxy:
+    name: nginx-proxy-manager_default
+    external: true
+
+volumes:
+  db_data:
+  wp_data:
