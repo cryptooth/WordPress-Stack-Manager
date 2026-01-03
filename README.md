@@ -13,6 +13,16 @@ This repository contains the configuration and tools to provision a Docker-based
 └── npm/                    # Nginx Proxy Manager configuration
 ```
 
+## Requirements
+*   **OS**: Ubuntu 20.04 or 22.04 LTS (Fresh Install Recommended)
+*   **Resources**: Minimum 1 vCPU / 2GB RAM
+*   **Ports**:
+    *   `80` & `443`: Web Traffic (NPM)
+    *   `81`: Nginx Proxy Manager Admin
+    *   `9000`: Portainer
+    *   `3000`: Stack Manager UI
+    *   `22xx`: SFTP Ports (Auto-assigned starting from 2201)
+
 ## How to Install on a New Server
 
 1.  **Prepare the Repo**:
@@ -24,7 +34,7 @@ This repository contains the configuration and tools to provision a Docker-based
 
 ```bash
 # 1. Download the setup script (or clone the whole repo)
-git clone https://github.com/YOUR_USER/YOUR_REPO.git ~/docker
+git clone https://github.com/cryptooth/WordPress-Stack-Manager.git ~/docker
 
 # 2. Go to the directory
 cd ~/docker
