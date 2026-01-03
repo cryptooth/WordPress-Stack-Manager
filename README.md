@@ -1,9 +1,17 @@
 # WordPress Stack Manager
 
-This repository contains the configuration and tools to provision a Docker-based WordPress hosting server.
+**The Ultimate Self-Hosted WordPress Solution**
 
-**Automated Setup**: You don't need to install Docker or configure anything manually.
-Just execute the script on a **fresh Ubuntu server** (Standard or Minimal), and it will install all dependencies (Docker, Git, etc.) and launch the stack for you.
+**WordPress Stack Manager** turns any fresh Ubuntu server into a professional, automated hosting platform in minutes. It completely automates the complexities of Docker, Nginx Proxy Manager (SSL/Routing), and Portainer, giving you a turnkey solution.
+
+🚀 **Key Features:**
+*   **One-Click Server Provisioning**: Turns a blank server into a hosting powerhouse.
+*   **Custom Dashboard**: Spin up new isolated WordPress sites in seconds.
+*   **Automated Security**: Each site gets its own isolated containers (App, DB, PMA) and dedicated SFTP.
+*   **Zero Configuration**: SSL certificates and Reverse Proxy handled via Nginx Proxy Manager.
+*   **Portable & Scalable**: Modern "Infrastructure as Code" structure using named volumes.
+
+**Setup so easy, it feels like magic.** Just run one script:
 
 ## Directory Structure
 ```text
