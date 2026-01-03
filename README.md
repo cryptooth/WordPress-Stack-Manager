@@ -46,6 +46,15 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
+
+## Security Configuration
+**IMPORTANT**: The default configuration uses insecure passwords. You must change them before using in production.
+
+1.  **WP Manager Password**:
+    *   Edit `manager/docker-compose.yml`
+    *   Change `ADMIN_PASSWORD` value.
+    *   Run `cd ~/docker/manager && docker compose up -d` to apply.
+
 ## Components
 *   **Portainer**: Exposed on Port `9000`. Used for container management.
 *   **Nginx Proxy Manager**: Exposed on Port `81`. Used to route domains to containers.
