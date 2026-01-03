@@ -2,6 +2,9 @@
 
 This repository contains the configuration and tools to provision a Docker-based WordPress hosting server.
 
+**Automated Setup**: You don't need to install Docker or configure anything manually.
+Just execute the script on a **fresh Ubuntu server** (Standard or Minimal), and it will install all dependencies (Docker, Git, etc.) and launch the stack for you.
+
 ## Directory Structure
 ```text
 .
