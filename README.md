@@ -54,7 +54,15 @@ chmod +x setup.sh
 ## Security Configuration
 **IMPORTANT**: The default configuration uses insecure passwords. You must change them before using in production.
 
-1.  **WP Manager Password**:
+1.  **Portainer Password**:
+    *   The initial password might be in the container logs.
+    *   Run: `docker logs portainer` to find it (if not prompted on first login).
+
+2.  **Nginx Proxy Manager**:
+    *   Default Login: `admin@example.com` / `changeme`
+    *   You will be asked to change this immediately.
+
+3.  **WP Manager Password**:
     *   Edit `manager/docker-compose.yml`
     *   Change `ADMIN_PASSWORD` value.
     *   Run `cd ~/docker/manager && docker compose up -d` to apply.
