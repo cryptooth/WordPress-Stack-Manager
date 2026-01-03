@@ -64,3 +64,38 @@ chmod +x setup.sh
 *   **WP Manager**: Exposed on Port `3000` (localhost only by default unless tunneled, check docker-compose).
     *   *Note*: The current `manager/docker-compose.yml` binds to `127.0.0.1:3000`. If you want to access it remotely during initial setup, you might need to change it to `3000:3000` temporarily or use an SSH Tunnel:
     *   `ssh -L 3000:localhost:3000 user@your-server-ip`
+
+## Docker Cheatsheet
+
+Here are some useful commands for managing your server.
+
+**List All Containers** (Running & Stopped)
+```bash
+docker ps -a
+```
+
+**View Container Logs**
+```bash
+# Example: Check NPM logs
+docker logs nginx-proxy-manager
+# Follow logs in real-time
+docker logs -f wp_manager
+```
+
+**Restart a Specific Service**
+```bash
+cd ~/docker/manager
+docker compose restart
+```
+
+**Stop & Remove a Stack** (Destructive!)
+If you want to manually delete a site (e.g., `mysite.com`) completely:
+```bash
+# 1. Stop and remove containers
+cd ~/docker/sites/mysite.com
+docker compose down
+
+# 2. (Optional) Remove data volumes (Database & WP Files will be lost!)
+docker compose down -v
+```
+
