@@ -59,10 +59,9 @@ chmod +x setup.sh
     *   Run: `docker logs portainer` to find it (if not prompted on first login).
 
 2.  **Nginx Proxy Manager**:
-    *   Default Login: `admin@example.com` / `changeme`
-    *   You will be asked to change this immediately.
+    *   Follow the on-screen instructions to create your admin account and password.
 
-3.  **WP Manager Password**:
+3.  **WordPress Stack Manager Password**:
     *   Edit `manager/docker-compose.yml`
     *   Change `ADMIN_PASSWORD` value.
     *   Run `cd ~/docker/manager && docker compose up -d` to apply.
