@@ -37,26 +37,32 @@
 
 ## How to Install on a New Server
 
-1.  **Prepare the Repo**:
-    *   Upload all these files to a GitHub repository (private recommended).
+## How to Install on a New Server
 
-2.  **On the VPS/Server**:
-    *   Login via SSH.
-    *   Run the following commands:
+You can use this repository directly or fork it to your own account if you want to customize the stack.
+
+### Option 1: Quick Start (Recommended)
+Run these commands on your VPS to pull the latest version of this manager:
 
 ```bash
-# 1. Download the setup script (or clone the whole repo)
+# 1. Clone the repository
 git clone https://github.com/cryptooth/WordPress-Stack-Manager.git ~/docker
 
-# 2. Go to the directory
+# 2. Enter the directory
 cd ~/docker
 
 # 3. Make script executable
 chmod +x setup.sh
 
-# 4. Run it
+# 4. Run the installer
 ./setup.sh
 ```
+
+### Option 2: Use Your Own Fork
+If you want to customize the stack (e.g. default plugins, themes in the template):
+1.  Fork this repository on GitHub.
+2.  Clone your own URL: `git clone https://github.com/YOUR_USERNAME/WordPress-Stack-Manager.git ~/docker`
+3.  Run setup as above.
 
 
 ## Security Configuration
