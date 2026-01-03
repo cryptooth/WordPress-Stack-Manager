@@ -54,7 +54,7 @@ services:
       - wp_data:/home/${SFTP_USER:-user}/upload
     ports:
       - "${SFTP_PORT:-2222}:22"
-    command: ${SFTP_USER:-user}:${SFTP_PASSWORD:-pass}:1001
+    command: ${SFTP_USER:-user}:${SFTP_PASSWORD:-pass}:33:33
 
 networks:
   proxy:
