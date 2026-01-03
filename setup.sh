@@ -29,9 +29,17 @@ if ! command -v docker &> /dev/null; then
     curl -fsSL https://get.docker.com -o get-docker.sh
     sudo sh get-docker.sh
     sudo usermod -aG docker $USER
-    echo ">>> Docker installed. NOTICE: You might need to re-login for group changes to take effect."
+    echo ">>> Docker installed."
 else
     echo ">>> Docker already installed."
+fi
+
+# 2.1 Refresh Group Permissions
+# If user is in 'docker' group (db) but current process isn't, reload script with proper group.
+if id -nG "$USER" | grep -qw "docker" && ! id -nG | grep -qw "docker"; then
+    echo ">>> User found in docker group but session not updated."
+    echo ">>> Reloading script with 'sg' to apply group permissions..."
+    exec sg docker -c "bash $0"
 fi
 
 # 3. Setup Directory Structure
