@@ -85,6 +85,47 @@ If you want to customize the stack (e.g. default plugins, themes in the template
     *   *Note*: The current `manager/docker-compose.yml` binds to `127.0.0.1:3000`. If you want to access it remotely during initial setup, you might need to change it to `3000:3000` temporarily or use an SSH Tunnel:
     *   `ssh -L 3000:localhost:3000 user@your-server-ip`
 
+## Workflow: How to Host a Site
+
+Here is the step-by-step process to launch a new site from scratch.
+
+### 1. DNS Configuration
+Before anything else, go to your Domain Registrar (Godaddy, Namecheap, Cloudflare, etc.) and:
+*   Add an **A Record** for your domain (e.g., `example.com`).
+*   Point it to your **Server's IP Address**.
+*   (Optional) Add a CNAME for `www`.
+
+### 2. Access the Manager
+*   Open `http://YOUR_SERVER_IP:3000`.
+*   **Important**: This port is open to the world by default.
+    *   **Option A (Quick)**: Use an SSH Tunnel for security (`ssh -L 3000:localhost:3000 user@ip`) and access via `localhost:3000`.
+    *   **Option B (Perm)**: Add a Host in Nginx Proxy Manager for `manager.yourdomain.com` pointing to `wp_manager` port `3000` and add Basic Auth.
+
+### 3. Deploy the Stack
+1.  Log in to **WordPress Stack Manager**.
+2.  Click **New Site**.
+3.  Enter the domain (e.g., `example.com`) and secure credentials.
+4.  Click **Deploy**.
+5.  Wait for the specific container details to appear (e.g., `examplecom-wordpress-1`). **Copy this Hostname.**
+
+### 4. Go Live (Nginx Proxy Manager)
+1.  Open **Nginx Proxy Manager** (`http://YOUR_SERVER_IP:81`).
+2.  Click **Proxy Hosts** -> **Add Proxy Host**.
+3.  **Details Tab**:
+    *   Domain Names: `example.com`
+    *   Scheme: `http`
+    *   Forward Hostname / IP: `examplecom-wordpress-1` (The one you copied)
+    *   Forward Port: `80`
+    *   Block Common Exploits: Enable
+4.  **SSL Tab**:
+    *   SSL Certificate: Request a new SSL Certificate
+    *   Force SSL: Enable
+    *   Email: Your email
+    *   Agree to Terms: Enable
+5.  Click **Save**.
+
+🎉 **Success!** Your site is now live at `https://example.com`.
+
 ## Docker Cheatsheet
 
 Here are some useful commands for managing your server.
