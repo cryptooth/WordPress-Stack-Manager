@@ -18,6 +18,7 @@ Just execute the script on a **fresh Ubuntu server** (Standard or Minimal), and 
 
 ## Requirements
 *   **OS**: Ubuntu 20.04 or 22.04 LTS (Fresh Install Recommended)
+*   **User**: Non-root user with `sudo` privileges (Recommended)
 *   **Resources**: Minimum 1 vCPU / 2GB RAM
 *   **Ports**:
     *   `80` & `443`: Web Traffic (NPM)
