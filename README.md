@@ -37,8 +37,6 @@
 
 ## How to Install on a New Server
 
-## How to Install on a New Server
-
 You can use this repository directly or fork it to your own account if you want to customize the stack.
 
 ### Option 1: Quick Start (Recommended)
