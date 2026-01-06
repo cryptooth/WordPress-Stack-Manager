@@ -1,0 +1,15 @@
+# Secrets
+.env
+*.env
+
+# Site Directories (Local only)
+sites/omerbelek.com.tr/
+sites/kayhanbelek.com/
+
+# IDEs
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db

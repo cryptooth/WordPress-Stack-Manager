@@ -11,6 +11,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
+      - ./conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
     networks:
       - default
     ports:
@@ -34,11 +35,13 @@ services:
     restart: always
     depends_on:
       - db
+      - redis
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: ${DB_USER}
       WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
       WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_REDIS_HOST: redis
     volumes:
       - wp_data:/var/www/html
     networks:
@@ -47,6 +50,12 @@ services:
     ports:
       - "127.0.0.1:${APP_PORT:-8080}:80"
 
+  redis:
+    image: redis:alpine
+    restart: always
+    networks:
+      - default
+
   sftp:
     image: atmoz/sftp
     restart: always
@@ -54,7 +63,7 @@ services:
       - wp_data:/home/${SFTP_USER:-user}/upload
     ports:
       - "${SFTP_PORT:-2222}:22"
-    command: ${SFTP_USER:-user}:${SFTP_PASSWORD:-pass}:33:33
+    command: ${SFTP_USER:-user}:${SFTP_PASSWORD:-pass}:1000:1000
 
 networks:
   proxy:

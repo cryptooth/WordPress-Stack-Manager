@@ -9,6 +9,7 @@
 *   **Custom Dashboard**: Spin up new isolated WordPress sites in seconds.
 *   **Automated Security**: Each site gets its own isolated containers (App, DB, PMA) and dedicated SFTP.
 *   **Zero Configuration**: SSL certificates and Reverse Proxy handled via Nginx Proxy Manager.
+*   **High Performance**: Pre-configured with Redis Object Cache, PHP OPcache, and tuned MariaDB.
 *   **Portable & Scalable**: Modern "Infrastructure as Code" structure using named volumes.
 
 **Setup so easy, it feels like magic.** Just run one script:
