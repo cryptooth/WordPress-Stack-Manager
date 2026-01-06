@@ -86,6 +86,25 @@ app.get('/api/sites', requireAuth, async (req, res) => {
     }
 });
 
+app.get('/api/stats', requireAuth, (req, res) => {
+    exec('docker stats --no-stream --format "{{json .}}"', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Stats error: ${error}`);
+            return res.status(500).json({ error: 'Failed to fetch stats' });
+        }
+        try {
+            // Docker stats outputs one JSON object per line.
+            const lines = stdout.trim().split('\n');
+            // Filter out empty lines and parse
+            const stats = lines.filter(line => line).map(line => JSON.parse(line));
+            res.json(stats);
+        } catch (parseError) {
+            console.error(`Parse error: ${parseError}`);
+            res.status(500).json({ error: 'Failed to parse stats' });
+        }
+    });
+});
+
 app.post('/api/sites', requireAuth, async (req, res) => {
     try {
         const { domain, dbName, dbUser, dbPassword, dbRootPassword, sftpUser, sftpPassword } = req.body;
